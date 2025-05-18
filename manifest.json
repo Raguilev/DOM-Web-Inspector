@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "DOM Inspector",
+  "version": "1.1",
+  "description": "Inspecciona cualquier elemento clickeado, incluyendo formularios, canvas y iframes.",
+  "permissions": ["scripting", "activeTab", "storage", "contextMenus"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "DOM Inspector",
+    "default_icon": "inspector.png"
+  },
+  "icons": {
+    "128": "inspector.png"
+  }
+}

@@ -1,8 +1,12 @@
 (function () {
-  console.log("🔍 Inspector de Elementos Activado");
+  if (window.__DOM_INSPECTOR_ACTIVE__) {
+    document.removeEventListener('click', window.__DOM_INSPECTOR_HANDLER__, true);
+    console.log("🛑 DOM Inspector DESACTIVADO");
+    window.__DOM_INSPECTOR_ACTIVE__ = false;
+    return;
+  }
 
-  // Manejar clics en cualquier parte del documento
-  document.addEventListener('click', function (event) {
+  function handleClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -31,9 +35,8 @@
     console.log("🧾 Outer HTML:");
     console.log(element.outerHTML);
 
-    // Para el detectar canvas
+    // Para detectar canvas
     if (element.tagName === "CANVAS") {
-      const canvas = element;
       const x = event.offsetX;
       const y = event.offsetY;
       console.log(`🎯 Click dentro de CANVAS en coordenadas internas: X=${x}, Y=${y}`);
@@ -52,11 +55,16 @@
     } else {
       console.log("ℹ️ No pertenece a un formulario.");
     }
+  }
 
-    return false;
-  }, true);
+  // Guardar el handler para permitir desactivación
+  window.__DOM_INSPECTOR_HANDLER__ = handleClick;
+  window.__DOM_INSPECTOR_ACTIVE__ = true;
 
-  // Escaneo de iframes y sus formularios
+  document.addEventListener('click', handleClick, true);
+  console.log("✅ DOM Inspector ACTIVADO");
+
+  // Escaneo inicial de iframes
   const iframes = document.querySelectorAll("iframe");
   if (iframes.length > 0) {
     console.log(`🖼️ Se encontraron ${iframes.length} iframe(s):`);
