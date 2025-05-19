@@ -1,15 +1,16 @@
 (function () {
   if (window.__DOM_INSPECTOR_ACTIVE__) {
     document.removeEventListener('click', window.__DOM_INSPECTOR_HANDLER__, true);
+    window.__DOM_INSPECTOR_CANVAS_LISTENERS__?.forEach(({ canvas, listener }) => {
+      canvas.removeEventListener('click', listener, true);
+    });
+    console.clear();
     console.log("🛑 DOM Inspector DESACTIVADO");
     window.__DOM_INSPECTOR_ACTIVE__ = false;
     return;
   }
 
   function handleClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
     const element = event.target;
     const rect = element.getBoundingClientRect();
     const path = [];
@@ -35,14 +36,6 @@
     console.log("🧾 Outer HTML:");
     console.log(element.outerHTML);
 
-    // Para detectar canvas
-    if (element.tagName === "CANVAS") {
-      const x = event.offsetX;
-      const y = event.offsetY;
-      console.log(`🎯 Click dentro de CANVAS en coordenadas internas: X=${x}, Y=${y}`);
-    }
-
-    // Si pertenece a un formulario
     const form = element.closest("form");
     if (form) {
       console.log("📝 Formulario contenedor:");
@@ -57,14 +50,39 @@
     }
   }
 
-  // Guardar el handler para permitir desactivación
+  // Registrar el listener principal
+  document.addEventListener('click', handleClick, true);
   window.__DOM_INSPECTOR_HANDLER__ = handleClick;
   window.__DOM_INSPECTOR_ACTIVE__ = true;
 
-  document.addEventListener('click', handleClick, true);
   console.log("✅ DOM Inspector ACTIVADO");
 
-  // Escaneo inicial de iframes
+  // 🧠 Listeners dedicados para <canvas>
+  window.__DOM_INSPECTOR_CANVAS_LISTENERS__ = [];
+
+  document.querySelectorAll('canvas').forEach((canvas, index) => {
+    const listener = function (e) {
+      e.stopPropagation(); // evita que otros lo bloqueen
+      const x = e.offsetX;
+      const y = e.offsetY;
+
+      console.log(`🎯 Click en CANVAS #${index + 1}`);
+      console.log(" - Coordenadas internas:", `X=${x}, Y=${y}`);
+      console.log(" - Tamaño:", `${canvas.width}x${canvas.height}`);
+      console.log(" - Bounding rect:", canvas.getBoundingClientRect());
+
+      // 🔴 Efecto visual de marcado
+      canvas.style.outline = '3px dashed red';
+      setTimeout(() => {
+        canvas.style.outline = '';
+      }, 1000);
+    };
+
+    canvas.addEventListener('click', listener, true);
+    window.__DOM_INSPECTOR_CANVAS_LISTENERS__.push({ canvas, listener });
+  });
+
+  // Escaneo de iframes (CORS-permitidos)
   const iframes = document.querySelectorAll("iframe");
   if (iframes.length > 0) {
     console.log(`🖼️ Se encontraron ${iframes.length} iframe(s):`);
