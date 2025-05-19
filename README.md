@@ -1,4 +1,4 @@
-# 🔍 DOM Inspector Extension
+# 🔍 DOM Web Inspector Extension
 
 Extensión para navegadores basada en Chromium (Google Chrome, Microsoft Edge) que permite inspeccionar elementos de una página web al hacer clic, incluyendo formularios, `canvas`, e `iframes`.
 
